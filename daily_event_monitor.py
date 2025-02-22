@@ -145,7 +145,8 @@ class DailyEventMonitor:
         year: int,
         month: int,
         day: int,
-        value: DailyEventValueType,
+        headline: DailyEventValueType,
+        link: DailyEventValueType = None,
         event_type: str = None,
         ignore_repeat: bool = True,
     ) -> bool:
@@ -163,17 +164,19 @@ class DailyEventMonitor:
         
         data = self._lookup_day(year=year, month=month, day=day)
 
-        if ignore_repeat and len(data) > 0 and data[-1][1] == value:
+        if ignore_repeat and len(data) > 0 and data[-1][1] == headline:
             return False
         
+        event_value = f"{headline} \n Link: ({link})" if link else headline
+        
         if event_type:
-            value = f"{event_type}: {value}"
+            value = f"{event_type}: {event_value}"
 
         # add data point
         data.append((time_now(), value))
         return True
 
-    def add_today(self, value: DailyEventValueType, link: str = None,  event_type: str = None, ignore_repeat: bool = True) -> bool:
+    def add_today(self, headline: DailyEventValueType, link: DailyEventValueType = None,  event_type: str = None, ignore_repeat: bool = True) -> bool:
         """
         Adds an event for the current day.
 
@@ -182,17 +185,15 @@ class DailyEventMonitor:
         :return: True if the event was added, False otherwise (e.g., if ignored due to being a repeat).
         """
         (year_now, month_now, day_now) = today()
-        success =  self.add(
+        return self.add(
             year=year_now,
             month=month_now,
             day=day_now,
-            value=value,
-            event_type = event_type,
+            headline= headline,
+            link=link,
+            event_type=event_type,
             ignore_repeat=ignore_repeat,
         )
-        if link:
-            self.add_link(year_now, month_now, day_now, link, event_type)
-        return success
         
     def add_link(self, year: int, month: int, day: int, link: str, event_type: str = None) -> bool:
         """

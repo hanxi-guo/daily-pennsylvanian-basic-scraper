@@ -84,10 +84,10 @@ if __name__ == "__main__":
 
     # Save data
     if data_point is not None:
-        dem.add_today(data_point, link = data_point_link, event_type="main_headline")
+        dem.add_today(value = data_point, link = data_point_link, event_type="main_headline")
         
     if most_recent is not None:
-        dem.add_today(most_recent, link = most_recent_link, event_type="most_recent")
+        dem.add_today(value = most_recent, link = most_recent_link, event_type="most_recent")
         dem.save()
         loguru.logger.info("Saved daily event monitor")
 
