@@ -37,22 +37,23 @@ def scrape_data_point():
             
         most_read_span = soup.find("span", id="mostRead")
         if most_read_span:
-            loguru.logger.info("Found mostRead section.")
-            
-            loguru.logger.debug(f"mostRead HTML: {most_read_span}")
+            loguru.logger.info("Found 'mostRead' span.")
 
-            most_read_item = most_read_span.find("div", class_="most-read-item")
-            
-            if most_read_item:
-                loguru.logger.info("Found most-read item.")
+            # Find the first row inside mostRead
+            most_read_row = most_read_span.find("div", class_="row")
+            if most_read_row:
+                loguru.logger.info("Found 'row' inside mostRead.")
 
-                loguru.logger.debug(f"most-read-item HTML: {most_read_item}")
+                # Find the first most-read-item inside the row
+                most_read_item = most_read_row.find("div", class_="most-read-item")
+                if most_read_item:
+                    loguru.logger.info("Found 'most-read-item'.")
 
-                most_read_element = most_read_item.find("a", class_="frontpage-link standard-link")
-                
-                if most_read_element:
-                    most_read = most_read_element.text
-                    loguru.logger.info(f"Most read article: {most_read}")
+                    # Find the <a> tag containing the article title
+                    most_read_element = most_read_item.find("a", class_="frontpage-link standard-link")
+                    if most_read_element:
+                        most_read = most_read_element.get_text(strip=True)
+                        loguru.logger.info(f"Most read article: {most_read}")
             
             
         return data_point, most_read
