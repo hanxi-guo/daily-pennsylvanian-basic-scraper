@@ -167,10 +167,13 @@ class DailyEventMonitor:
         if ignore_repeat and len(data) > 0 and data[-1][1] == headline:
             return False
         
-        event_value = f"{headline} \n Link: ({link})" if link else headline
+        if link:
+            formatted_value = f"{headline}\n{link}"
+        else:
+            formatted_value = headline
         
         if event_type:
-            value = f"{event_type}: {event_value}"
+            value = f"{event_type}: {formatted_value}"
 
         # add data point
         data.append((time_now(), value))
