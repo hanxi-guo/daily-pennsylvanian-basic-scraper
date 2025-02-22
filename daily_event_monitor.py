@@ -5,7 +5,7 @@ import os
 import pathlib
 import typing
 
-
+import requests
 import pytz
 
 TIMEZONE = pytz.timezone("US/Eastern")
