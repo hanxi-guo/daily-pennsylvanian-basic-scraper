@@ -173,7 +173,7 @@ class DailyEventMonitor:
         data.append((time_now(), value))
         return True
 
-    def add_today(self, value: DailyEventValueType, event_type: str = None, ignore_repeat: bool = True) -> bool:
+    def add_today(self, value: DailyEventValueType, link: str = None,  event_type: str = None, ignore_repeat: bool = True) -> bool:
         """
         Adds an event for the current day.
 
@@ -182,7 +182,7 @@ class DailyEventMonitor:
         :return: True if the event was added, False otherwise (e.g., if ignored due to being a repeat).
         """
         (year_now, month_now, day_now) = today()
-        return self.add(
+        success =  self.add(
             year=year_now,
             month=month_now,
             day=day_now,
@@ -190,6 +190,23 @@ class DailyEventMonitor:
             event_type = event_type,
             ignore_repeat=ignore_repeat,
         )
+        if link:
+            self.add_link(year_now, month_now, day_now, link, event_type)
+        return success
+        
+    def add_link(self, year: int, month: int, day: int, link: str, event_type: str = None) -> bool:
+        """
+        Adds a link for an event on a specific day.
+
+        :param year: The year of the event.
+        :param month: The month of the event.
+        :param day: The day of the event.
+        :param link: The URL of the event.
+        :param event_type: The type of event (optional).
+        :return: True if the link was added, False if ignored as a duplicate.
+        """
+        link_key = f"{event_type}_link" if event_type else "general_link"
+        return self.add(year, month, day, value=link, event_type=link_key, ignore_repeat=False)
 
     def load(self, filename: typing.Optional[str] = None) -> bool:
         """
