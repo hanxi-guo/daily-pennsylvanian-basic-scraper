@@ -176,7 +176,7 @@ class DailyEventMonitor:
         data.append((time_now(), value))
         return True
 
-    def add_today(self, headline: DailyEventValueType, link: DailyEventValueType = None,  event_type: str = None, ignore_repeat: bool = True) -> bool:
+    def add_today(self, value: DailyEventValueType, link: DailyEventValueType = None,  event_type: str = None, ignore_repeat: bool = True) -> bool:
         """
         Adds an event for the current day.
 
@@ -189,7 +189,7 @@ class DailyEventMonitor:
             year=year_now,
             month=month_now,
             day=day_now,
-            headline= headline,
+            headline = value,
             link=link,
             event_type=event_type,
             ignore_repeat=ignore_repeat,
