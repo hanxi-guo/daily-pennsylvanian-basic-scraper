@@ -146,6 +146,7 @@ class DailyEventMonitor:
         month: int,
         day: int,
         value: DailyEventValueType,
+        event_type: str = None,
         ignore_repeat: bool = True,
     ) -> bool:
         """
@@ -158,16 +159,21 @@ class DailyEventMonitor:
         :param ignore_repeat: Whether to ignore the event if it is a repeat of the last event for that day.
         :return: True if the event was added, False otherwise (e.g., if ignored due to being a repeat).
         """
+        
+        
         data = self._lookup_day(year=year, month=month, day=day)
 
         if ignore_repeat and len(data) > 0 and data[-1][1] == value:
             return False
+        
+        if event_type:
+            value = f"{event_type}:{value}"
 
         # add data point
         data.append((time_now(), value))
         return True
 
-    def add_today(self, value: DailyEventValueType, ignore_repeat: bool = True) -> bool:
+    def add_today(self, value: DailyEventValueType, event_type: str = None, ignore_repeat: bool = True) -> bool:
         """
         Adds an event for the current day.
 
@@ -181,6 +187,7 @@ class DailyEventMonitor:
             month=month_now,
             day=day_now,
             value=value,
+            event_type = event_type,
             ignore_repeat=ignore_repeat,
         )
 

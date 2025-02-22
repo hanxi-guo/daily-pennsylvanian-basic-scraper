@@ -32,7 +32,19 @@ def scrape_data_point():
         target_element = soup.find("a", class_="frontpage-link")
         data_point = "" if target_element is None else target_element.text
         loguru.logger.info(f"Data point: {data_point}")
-        return data_point
+        
+        
+            
+        most_read_span = soup.find("span", id="mostRead")
+        if most_read_span:
+            most_read_item = most_read_span.find("div", class_="most-read-item")
+            if most_read_item is not None:
+                most_read_element = most_read_item.find("a", class_="frontpage-link standard-link")
+                most_read = "" if most_read_element is None else most_read_element.text
+                loguru.logger.info(f"Most read: {most_read}")
+            
+            
+        return data_point, most_read
 
 
 if __name__ == "__main__":
@@ -57,14 +69,18 @@ if __name__ == "__main__":
     # Run scrape
     loguru.logger.info("Starting scrape")
     try:
-        data_point = scrape_data_point()
+        data_point, most_read = scrape_data_point()
     except Exception as e:
         loguru.logger.error(f"Failed to scrape data point: {e}")
         data_point = None
+        most_read = None 
 
     # Save data
     if data_point is not None:
-        dem.add_today(data_point)
+        dem.add_today(data_point, event_type="main_headline")
+        
+    if most_read  is not None:
+        dem.add_today(most_read, event_type="most_read")
         dem.save()
         loguru.logger.info("Saved daily event monitor")
 
