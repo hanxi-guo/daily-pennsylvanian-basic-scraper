@@ -12,6 +12,13 @@ import bs4
 import requests
 import loguru
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
 
 def scrape_data_point():
     """
@@ -32,31 +39,39 @@ def scrape_data_point():
         target_element = soup.find("a", class_="frontpage-link")
         data_point = "" if target_element is None else target_element.text
         loguru.logger.info(f"Data point: {data_point}")
-        
-        most_read = ""
-            
-        most_read_span = soup.find("span", id="mostRead")
-        if most_read_span:
-            loguru.logger.info("Found 'mostRead' span.")
-
-            # Find the first row inside mostRead
-            most_read_row = most_read_span.find("div", class_="row")
-            if most_read_row:
-                loguru.logger.info("Found 'row' inside mostRead.")
-
-                # Find the first most-read-item inside the row
-                most_read_item = most_read_row.find("div", class_="most-read-item")
-                if most_read_item:
-                    loguru.logger.info("Found 'most-read-item'.")
-
-                    # Find the <a> tag containing the article title
-                    most_read_element = most_read_item.find("a", class_="frontpage-link standard-link")
-                    if most_read_element:
-                        most_read = most_read_element.get_text(strip=True)
-                        loguru.logger.info(f"Most read article: {most_read}")
             
             
-        return data_point, most_read
+        return data_point
+    
+def scrape_most_read():
+    """
+    Uses Selenium to scrape the most-read article title, handling JavaScript-loaded content.
+    """
+    options = Options()
+    options.add_argument("--headless") 
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    try:
+        driver.get("https://www.thedp.com")
+        time.sleep(5)  
+
+        most_read_section = driver.find_element(By.ID, "mostRead")
+        most_read_item = most_read_section.find_element(By.CLASS_NAME, "most-read-item")
+        most_read_link = most_read_item.find_element(By.TAG_NAME, "a")
+
+        most_read_title = most_read_link.text
+        print(f"Most Read Article: {most_read_title}")
+
+        return most_read_title
+    except Exception as e:
+        print("Error extracting most-read article:", e)
+        return ""
+
+    finally:
+        driver.quit()
 
 
 if __name__ == "__main__":
