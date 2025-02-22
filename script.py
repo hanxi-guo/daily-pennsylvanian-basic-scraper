@@ -37,11 +37,22 @@ def scrape_data_point():
             
         most_read_span = soup.find("span", id="mostRead")
         if most_read_span:
+            loguru.logger.info("Found mostRead section.")
+            
+            loguru.logger.debug(f"mostRead HTML: {most_read_span}")
+
             most_read_item = most_read_span.find("div", class_="most-read-item")
-            if most_read_item is not None:
+            
+            if most_read_item:
+                loguru.logger.info("Found most-read item.")
+
+                loguru.logger.debug(f"most-read-item HTML: {most_read_item}")
+
                 most_read_element = most_read_item.find("a", class_="frontpage-link standard-link")
-                most_read = "" if most_read_element is None else most_read_element.text
-                loguru.logger.info(f"Most read: {most_read}")
+                
+                if most_read_element:
+                    most_read = most_read_element.text
+                    loguru.logger.info(f"Most read article: {most_read}")
             
             
         return data_point, most_read
@@ -79,7 +90,7 @@ if __name__ == "__main__":
     if data_point is not None:
         dem.add_today(data_point, event_type="main_headline")
         
-    if most_read  is not None:
+    if most_read is not None:
         dem.add_today(most_read, event_type="most_read")
         dem.save()
         loguru.logger.info("Saved daily event monitor")
