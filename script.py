@@ -38,40 +38,25 @@ def scrape_data_point():
         soup = bs4.BeautifulSoup(req.text, "html.parser")
         target_element = soup.find("a", class_="frontpage-link")
         data_point = "" if target_element is None else target_element.text
-        loguru.logger.info(f"Data point: {data_point}")
-            
-            
-        return data_point
-    
-def scrape_most_read():
-    """
-    Uses Selenium to scrape the most-read article title, handling JavaScript-loaded content.
-    """
-    options = Options()
-    options.add_argument("--headless") 
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
+        data_point_link = target_element.get("href", "") if target_element else ""
+        loguru.logger.info(f"Data point: {data_point} \n  Link: {data_point_link}")
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        most_recent = ""
 
-    try:
-        driver.get("https://www.thedp.com")
-        time.sleep(5)  
+        most_recent_section = soup.find("div", class_="top-story-sidebar")
 
-        most_read_section = driver.find_element(By.ID, "mostRead")
-        most_read_item = most_read_section.find_element(By.CLASS_NAME, "most-read-item")
-        most_read_link = most_read_item.find_element(By.TAG_NAME, "a")
+        most_recent_article = most_recent_section.find("a", class_="frontpage-link small-link") if most_recent_section else None
 
-        most_read_title = most_read_link.text
-        print(f"Most Read Article: {most_read_title}")
+        if most_recent_article:
+            most_recent = "" if most_recent_article is None else most_recent_article.text
+            most_recent_link = most_recent_article.get("href", "") if most_recent_article else ""
+            loguru.logger.info (f"Most Recent Article: {most_recent} \n  Link: {most_recent_link}")
+        else:
+            print("Most Recent article not found.")
+    else:
+        print("Failed to load the page.")
 
-        return most_read_title
-    except Exception as e:
-        print("Error extracting most-read article:", e)
-        return ""
-
-    finally:
-        driver.quit()
+    return data_point, data_point_link, most_recent, most_recent_link
 
 
 if __name__ == "__main__":
@@ -96,18 +81,20 @@ if __name__ == "__main__":
     # Run scrape
     loguru.logger.info("Starting scrape")
     try:
-        data_point, most_read = scrape_data_point()
+        data_point, data_point_link, most_recent, most_recent_link  = scrape_data_point()
     except Exception as e:
         loguru.logger.error(f"Failed to scrape data point: {e}")
         data_point = None
-        most_read = None 
+        most_recent = None 
+        data_point_link = None
+        most_recent_link = None
 
     # Save data
     if data_point is not None:
         dem.add_today(data_point, event_type="main_headline")
         
-    if most_read is not None:
-        dem.add_today(most_read, event_type="most_read")
+    if most_recent is not None:
+        dem.add_today(most_recent, event_type="most_recent")
         dem.save()
         loguru.logger.info("Saved daily event monitor")
 

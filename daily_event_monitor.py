@@ -167,7 +167,7 @@ class DailyEventMonitor:
             return False
         
         if event_type:
-            value = f"{event_type}:{value}"
+            value = f"{event_type}: {value}"
 
         # add data point
         data.append((time_now(), value))
