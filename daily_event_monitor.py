@@ -168,7 +168,7 @@ class DailyEventMonitor:
             return False
         
         if link:
-            formatted_value = f"{headline}; Rederence link:  {link}"
+            formatted_value = f"{headline}; Reference Link:  {link}"
         else:
             formatted_value = headline
         
